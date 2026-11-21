@@ -25,7 +25,7 @@ def main():
 	n=data.count() #统计总二维点数量
 	
 	#2.初始化中心
-	all_points=data.collect() #将二维点数组去重
+	all_points=data.collect() #将分布式数据集数据全部拉回Driver端
 	rng=np.random.RandomState(42)
 	idx=rng.choice(n,size=3,replace=False)
 	centroids=np.array([all_points[i] for i in idx])
@@ -62,7 +62,7 @@ def main():
 			break #提前终止循环
 	#6.输出最终迭代结果:（labels,point(x,y)）
 	bc=sc.broadcast(centroids) #再次广播计算
-	final=data.map(lambda p : (assign_label(p,bc.value),p)).collect() #计算簇结果并去重
+	final=data.map(lambda p : (assign_label(p,bc.value),p)).collect() #计算最终分簇结果并数据全部拉回Driver端
 	
 	#7.按中心坐标排序并进行标签重映射
 	#centroids[:,1],centroids[:,0]:
